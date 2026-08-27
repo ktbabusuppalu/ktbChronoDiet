@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ktbChronoDiet - Master Suite</title>
+    <style>
+        :root {
+            --primary: #1e293b;
+            --secondary: #0f172a;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px 10px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-sizing: border-box;
+        }
+        h1 {
+            color: var(--secondary);
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #0f172a, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+        /* Lock Screen */
+        #lockScreen {
+            text-align: center;
+            padding: 30px 10px;
+        }
+        #lockScreen input {
+            max-width: 260px;
+            margin: 20px auto;
+            text-align: center;
+            letter-spacing: 4px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            font-weight: 600;
+            display: none;
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        /* Main App Container */
+        #appContent {
+            display: none;
+        }
+        .section-box {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .section-box h2 {
+            color: var(--secondary);
+            font-size: 1.2rem;
+            margin-top: 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        
+        /* Responsive Grid System */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        /* Mobile Breakpoint: Stack everything vertically on phones */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px 5px;
+            }
+            .container {
+                padding: 15px 12px;
+                border-radius: 10px;
+            }
+            h1 {
+                font-size: 1.4rem;
+            }
+            .grid-3 {
+                grid-template-columns: 1fr; /* Turns 3-column into single stacked column */
+                gap: 10px;
+            }
+            .tabs {
+                flex-direction: column;
+            }
+            .tab-btn {
+                width: 100%;
+            }
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #ffffff;
+        }
+        input:focus, select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #475569;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .tab-btn:hover {
+            background: #cbd5e1;
+        }
+        .tab-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+        .day-content {
+            display: none;
+        }
+        .day-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+        }
+        .results-box {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 2px dashed var(--accent);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .badge {
+            background: var(--secondary);
+            color: #34d399;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f1f5f9;
+            color: var(--secondary);
+        }
+        details summary {
+            font-weight: bold;
+            color: var(--secondary);
+            padding: 5px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- 1. Password Lock Screen -->
+    <div id="lockScreen">
+        <h1>ktbChronoDiet</h1>
+        <p class="subtitle">Secure Biometric Intelligence Suite</p>
+        <div class="section-box" style="max-width: 380px; margin: 0 auto;">
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">🔒 Enter active password to unlock.</p>
+            <input type="password" id="passInput" placeholder="••••" maxlength="4">
+            <button class="btn-submit" onclick="checkPassword()">Unlock Portal</button>
+            <div class="error-msg" id="errorMsg">⚠️ Incorrect code. Use correct password.</div>
+        </div>
+    </div>
+
+    <!-- Main Application Master Wrapper -->
+    <div id="appContent">
+        <h1>ktbChronoDiet</h1>
+        <p class="subtitle">Master Rule Engine & 7-Day Biological Aggregation System</p>
+
+        <!-- 2. Interactive Rule Reference Tables Section -->
+        <div class="section-box">
+            <h2>📊 Reference Tables & Rule Matrix</h2>
+            <details open>
+                <summary>Click to view complete shift logic and baselines</summary>
+                
+                <p style="margin-top: 10px; font-size: 0.85rem; color: #475569;"><strong>Core Rule:</strong> For every 10-unit variation from clinical targets, meal timing shifts by **30 minutes (±0.5 hours)**. High readings postpone (+); low readings advance (-).</p>
+
+                <h4 style="margin: 12px 0 4px 0; color: var(--secondary); font-size: 0.9rem;">Blood Sugar Baseline Targets</h4>
+                <ul style="color: #475569; font-size: 0.85rem; margin-top: 0; padding-left: 15px;">
+                    <li>Breakfast Target: <strong>90 mg/dL</strong></li>
+                    <li>Lunch Target: <strong>110 mg/dL</strong></li>
+                    <li>Dinner Target: <strong>100 mg/dL</strong></li>
+                </ul>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <tr><th>Sugar Variance</th><th>Shift Rule</th></tr>
+                        <tr><td>High (+10 to +30+ units over target)</td><td>Postpone meal time (+30m to +90m)</td></tr>
+                        <tr><td>Optimal (0 to ±9 units)</td><td>No change (0m)</td></tr>
+                        <tr><td>Low (-10 to -30- units under target)</td><td>Advance meal time (-30m to -90m)</td></tr>
+                    </table>
+                </div>
+
+                <h4 style="margin: 12px 0 4px 0; color: var(--secondary); font-size: 0.9rem;">Blood Pressure Baseline Target</h4>
+                <ul style="color: #475569; font-size: 0.85rem; margin-top: 0; padding-left: 15px;">
+                    <li>Systolic Target Baseline: <strong>120 mmHg</strong></li>
+                </ul>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <tr><th>Systolic BP Variance</th><th>Shift Rule</th></tr>
+                        <tr><td>High / Elevated (+10 to +20+ units over 120)</td><td>Postpone meal time (+30m to +60m)</td></tr>
+                        <tr><td>Optimal ($\le 120$)</td><td>No change (0m)</td></tr>
+                        <tr><td>Low / Hypotension (-10 to -20+ units under 120)</td><td>Advance meal time (-30m to -60m)</td></tr>
+                    </table>
+                </div>
+            </details>
+        </div>
+
+        <!-- 3. User Profile Parameters Section -->
+        <div class="section-box">
+            <h2>👤 Personal Anthropometric Parameters</h2>
+            <div class="grid-3">
+                <div>
+                    <label for="gender">1. Gender</label>
+                    <select id="gender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="height">2. Height (cm)</label>
+                    <input type="number" id="height" placeholder="170" value="170">
+                </div>
+                <div>
+                    <label for="weight">3. Weight (kg)</label>
+                    <input type="number" id="weight" placeholder="70" value="70">
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Complete 7-Day Tabbed Biometric & Meal Log Section -->
+        <div class="section-box">
+            <h2>📅 7-Day Biometric & Meal Log Entries</h2>
+            <div class="tabs" id="dayTabs">
+                <button class="tab-btn active" onclick="switchDay(1)">Day 1</button>
+                <button class="tab-btn" onclick="switchDay(2)">Day 2</button>
+                <button class="tab-btn" onclick="switchDay(3)">Day 3</button>
+                <button class="tab-btn" onclick="switchDay(4)">Day 4</button>
+                <button class="tab-btn" onclick="switchDay(5)">Day 5</button>
+                <button class="tab-btn" onclick="switchDay(6)">Day 6</button>
+                <button class="tab-btn" onclick="switchDay(7)">Day 7</button>
+            </div>
+
+            <!-- Populated Containers for All 7 Days -->
+            <div id="daysContainer"></div>
+
+            <button class="btn-submit" style="margin-top: 15px;" onclick="calculateOptimalTimes()">🚀 Run 7-Day Aggregation Master Analysis</button>
+        </div>
+
+        <!-- 5. Results Section -->
+        <div class="results-box" id="resultsBox">
+            <h2 style="color: #065f46; border-bottom: 2px solid #a7f3d0; margin-top: 0; padding-bottom: 8px; font-size: 1.2rem;">✨ ktbChronoDiet Final Recommended Hours</h2>
+            <div id="recommendationOutput"></div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Automated Password Generator
+    function getDynamicPassword() {
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        return day + month; 
+    }
+
+    function checkPassword() {
+        const pass = document.getElementById('passInput').value;
+        if (pass === getDynamicPassword()) {
+            document.getElementById('lockScreen').style.display = 'none';
+            document.getElementById('appContent').style.display = 'block';
+        } else {
+            document.getElementById('errorMsg').style.display = 'block';
+        }
+    }
+
+    // Build 7 complete day entry forms dynamically
+    const container = document.getElementById('daysContainer');
+    for (let i = 1; i <= 7; i++) {
+        container.innerHTML += `
+            <div class="day-content ${i === 1 ? 'active' : ''}" id="day-${i}-content">
+                <h3 style="color: var(--secondary); margin-bottom: 12px; font-size: 1rem;">Day ${i} Log Entries</h3>
+                
+                <!-- Breakfast -->
+                <h4 style="margin:5px 0; color:#334155; font-size:0.9rem;">Breakfast Slot</h4>
+                <div class="grid-3" style="margin-bottom: 12px;">
+                    <div><label>Time</label><input type="time" id="b_time_${i}" value="08:00"></div>
+                    <div><label>BP (Sys/Dia)</label><input type="text" id="b_bp_${i}" value="120/80"></div>
+                    <div><label>Sugar (mg/dL)</label><input type="number" id="b_sugar_${i}" value="90"></div>
+                </div>
+
+                <!-- Lunch -->
+                <h4 style="margin:5px 0; color:#334155; font-size:0.9rem;">Lunch Slot</h4>
+                <div class="grid-3" style="margin-bottom: 12px;">
+                    <div><label>Time</label><input type="time" id="l_time_${i}" value="13:00"></div>
+                    <div><label>BP (Sys/Dia)</label><input type="text" id="l_bp_${i}" value="120/80"></div>
+                    <div><label>Sugar (mg/dL)</label><input type="number" id="l_sugar_${i}" value="110"></div>
+                </div>
+
+                <!-- Night Dinner -->
+                <h4 style="margin:5px 0; color:#334155; font-size:0.9rem;">Night Dinner Slot</h4>
+                <div class="grid-3">
+                    <div><label>Time</label><input type="time" id="d_time_${i}" value="20:00"></div>
+                    <div><label>BP (Sys/Dia)</label><input type="text" id="d_bp_${i}" value="120/80"></div>
+                    <div><label>Sugar (mg/dL)</label><input type="number" id="d_sugar_${i}" value="100"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    function switchDay(dayNum) {
+        document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active', idx + 1 === dayNum);
+        });
+        document.querySelectorAll('.day-content').forEach((content, idx) => {
+            content.classList.toggle('active', idx + 1 === dayNum);
+        });
+    }
+
+    // Comprehensive 7-Day Aggregation & Shifting Calculation Engine
+    function calculateOptimalTimes() {
+        let totalBreakfastMin = 0;
+        let totalLunchMin = 0;
+        let totalDinnerMin = 0;
+
+        for (let i = 1; i <= 7; i++) {
+            let bTime = timeToDecimal(document.getElementById(`b_time_${i}`).value);
+            let lTime = timeToDecimal(document.getElementById(`l_time_${i}`).value);
+            let dTime = timeToDecimal(document.getElementById(`d_time_${i}`).value);
+
+            let bSugar = parseFloat(document.getElementById(`b_sugar_${i}`).value);
+            let lSugar = parseFloat(document.getElementById(`l_sugar_${i}`).value);
+            let dSugar = parseFloat(document.getElementById(`d_sugar_${i}`).value);
+
+            let bBp = parseBp(document.getElementById(`b_bp_${i}`).value);
+            let lBp = parseBp(document.getElementById(`l_bp_${i}`).value);
+            let dBp = parseBp(document.getElementById(`d_bp_${i}`).value);
+
+            let bShift = getShift(bSugar, 90) + getShift(bBp.sys, 120);
+            let lShift = getShift(lSugar, 110) + getShift(lBp.sys, 120);
+            let dShift = getShift(dSugar, 100) + getShift(dBp.sys, 120);
+
+            totalBreakfastMin += (bTime + bShift);
+            totalLunchMin += (lTime + lShift);
+            totalDinnerMin += (dTime + dShift);
+        }
+
+        let finalBreakfast = decimalToTime(totalBreakfastMin / 7);
+        let finalLunch = decimalToTime(totalLunchMin / 7);
+        let finalDinner = decimalToTime(totalDinnerMin / 7);
+
+        const resultBox = document.getElementById('resultsBox');
+        const output = document.getElementById('recommendationOutput');
+        
+        output.innerHTML = `
+            <ul style="list-style: none; padding: 0; line-height: 2.25rem; font-size:0.95rem;">
+                <li><strong>🍳 Optimized Breakfast Hour:</strong> <span class="badge">${finalBreakfast}</span></li>
+                <li><strong>🥗 Optimized Lunch Hour:</strong> <span class="badge">${finalLunch}</span></li>
+                <li><strong>🌙 Optimized Night Dinner Hour:</strong> <span class="badge">${finalDinner}</span></li>
+            </ul>
+            <p style="font-size: 0.85rem; color: #047857; margin-top: 15px;"><em>✨ Aggregation complete across all 7 daily data entries using the exact ±30 min rule table per 10-unit biometric deviation.</em></p>
+        `;
+        resultBox.style.display = 'block';
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function getShift(actual, target) {
+        let diff = actual - target;
+        return (diff / 10) * 0.5;
+    }
+
+    function parseBp(bpStr) {
+        let parts = bpStr.split('/');
+        return {
+            sys: parts[0] ? parseFloat(parts[0]) : 120,
+            dia: parts[1] ? parseFloat(parts[1]) : 80
+        };
+    }
+
+    function timeToDecimal(timeStr) {
+        let parts = timeStr.split(':');
+        return parseInt(parts[0]) + parseInt(parts[1]) / 60;
+    }
+
+    function decimalToTime(dec) {
+        if (dec < 0) dec += 24;
+        if (dec >= 24) dec %= 24;
+        let hours = Math.floor(dec);
+        let minutes = Math.round((dec - hours) * 60);
+        if (minutes === 60) { hours += 1; minutes = 0; }
+        return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+</script>
+
+</body>
+</html>
